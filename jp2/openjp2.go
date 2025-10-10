@@ -39,49 +39,48 @@ static void gojp2_result_set_error(gojp2_result *result, const char *msg) {
 static OPJ_SIZE_T gojp2_read(void *p_buffer, OPJ_SIZE_T nb_bytes, void *user_data) {
     gojp2_buffer *buffer = (gojp2_buffer *)user_data;
     if (!buffer || !p_buffer) {
+        return (OPJ_SIZE_T)-1;
+    }
+    if (nb_bytes == 0U) {
         return (OPJ_SIZE_T)0;
     }
     size_t remaining = 0;
     if (buffer->offset < buffer->length) {
         remaining = buffer->length - buffer->offset;
     }
-    if (nb_bytes > remaining) {
-        nb_bytes = (OPJ_SIZE_T)remaining;
+    if (remaining == 0) {
+        return (OPJ_SIZE_T)-1;
     }
-    if (nb_bytes > 0U) {
-        memcpy(p_buffer, buffer->data + buffer->offset, (size_t)nb_bytes);
-        buffer->offset += (size_t)nb_bytes;
+    OPJ_SIZE_T to_copy = nb_bytes;
+    if ((OPJ_SIZE_T)remaining < to_copy) {
+        to_copy = (OPJ_SIZE_T)remaining;
     }
-    return nb_bytes;
+    memcpy(p_buffer, buffer->data + buffer->offset, (size_t)to_copy);
+    buffer->offset += (size_t)to_copy;
+    return to_copy;
 }
 
 static OPJ_OFF_T gojp2_skip(OPJ_OFF_T nb_bytes, void *user_data) {
     gojp2_buffer *buffer = (gojp2_buffer *)user_data;
     if (!buffer) {
+        return (OPJ_OFF_T)-1;
+    }
+    if (nb_bytes <= 0) {
         return (OPJ_OFF_T)0;
     }
-    if (nb_bytes == 0) {
-        return (OPJ_OFF_T)0;
+    size_t remaining = 0;
+    if (buffer->offset < buffer->length) {
+        remaining = buffer->length - buffer->offset;
     }
-    if (nb_bytes > 0) {
-        size_t remaining = 0;
-        if (buffer->offset < buffer->length) {
-            remaining = buffer->length - buffer->offset;
-        }
-        size_t advance = (size_t)nb_bytes;
-        if (advance > remaining) {
-            advance = remaining;
-        }
-        buffer->offset += advance;
-        return (OPJ_OFF_T)advance;
+    if (remaining == 0) {
+        return (OPJ_OFF_T)-1;
     }
-    // negative skip
-    size_t back = (size_t)(-nb_bytes);
-    if (back > buffer->offset) {
-        back = buffer->offset;
+    size_t advance = (size_t)nb_bytes;
+    if (advance > remaining) {
+        advance = remaining;
     }
-    buffer->offset -= back;
-    return -(OPJ_OFF_T)back;
+    buffer->offset += advance;
+    return (OPJ_OFF_T)advance;
 }
 
 static OPJ_BOOL gojp2_seek(OPJ_OFF_T nb_bytes, void *user_data) {
