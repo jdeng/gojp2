@@ -1,7 +1,7 @@
 #ifndef OPJ_CONFIG_PRIVATE_H
 #define OPJ_CONFIG_PRIVATE_H
 
-/* Manually generated from opj_config_private.h.cmake.in for Windows and Linux builds. */
+/* Manually generated from opj_config_private.h.cmake.in for Windows, macOS, and Linux builds. */
 
 #define OPJ_PACKAGE_VERSION "2.5.0"
 
@@ -9,6 +9,19 @@
 
 #define OPJ_HAVE_MALLOC_H 1
 #define OPJ_HAVE__ALIGNED_MALLOC 1
+
+#elif defined(__APPLE__)
+
+#ifndef _DARWIN_C_SOURCE
+#define _DARWIN_C_SOURCE 1
+#endif
+#define _LARGEFILE_SOURCE
+#define _LARGE_FILES 1
+#ifndef _FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS 64
+#endif
+#define OPJ_HAVE_FSEEKO 1
+#define OPJ_HAVE_POSIX_MEMALIGN 1
 
 #else /* POSIX-like platforms */
 
