@@ -6,7 +6,7 @@ import (
 	"image"
 	"io"
 
-	"gojp2/jp2"
+	"github.com/jdeng/gojp2/jp2"
 )
 
 // Decode reads a JPEG 2000 codestream from data and returns it as a Go image.

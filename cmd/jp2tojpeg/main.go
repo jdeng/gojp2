@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"gojp2"
+	"github.com/jdeng/gojp2"
 )
 
 func main() {
